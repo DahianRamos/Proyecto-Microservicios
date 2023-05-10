@@ -1,6 +1,32 @@
 version: '3.1'
 
+volumes:
+  keycloak_data:
+
+
 services:
+
+  db:
+    container_name: server-mysql
+    image: mysql
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - './volumenes/postgres:/var/lib/mysql'
+    hostname: server-mysql
+
+  adminer:
+    container_name: server-adminer
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+    hostname: server-adminer
+
   mongo:
     image: mongo
     restart: always
@@ -13,43 +39,22 @@ services:
       - './volumenes/mongodb:/data/db'
 
   mongo-express:
-      image: mongo-express
-      restart: always
-      depends_on:
-        - mongo
-      ports:
-        - "8087:8081"
-      environment:
-        ME_CONFIG_MONGODB_ADMINUSERNAME: root
-        ME_CONFIG_MONGODB_ADMINPASSWORD: example
-        ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-
-  db:
-    container_name: server-mysql
-    image: mysql
-    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
-    # (this is just an example, not intended to be a production configuration)
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: laura
-    volumes:
-      - './volumenes/postgres:/var/lib/mysql'
-    hostname: server-mysql
-
-  adminer:
-    container_name: server-adminer
-    image: adminer
+    image: mongo-express
     restart: always
     ports:
-      - "8081:8080"
-    hostname: server-adminer
+      - 8085:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
   eureka:
     image: eureka-server
     restart: always
     ports:
       - "8761:8761"
+
+
 
   clientes:
     image: cliente-service
@@ -71,20 +76,18 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/libros?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=laura
+      - SPRING_DATASOURCE_PASSWORD=root
       - eureka.client.service-url.defaultZone=http://eureka:8761/eureka
-
-  prestamos:
-    image: prestamo-service
-    restart: always
-    depends_on:
-    - db
-    - eureka
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0.2
+    command: start-dev
+    volumes:
+      - keycloak_data:/opt/keycloak/data/
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/prestamos?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=laura
-      - eureka.client.service-url.defaultZone=http://eureka:8761/eureka
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 9090:8080
 
   gateway:
    image: gateway-service
@@ -94,7 +97,6 @@ services:
      - eureka
      - clientes
      - libros
-     - prestamos
    environment:
      - eureka.client.service-url.defaultZone=http://eureka:8761/eureka
    ports:

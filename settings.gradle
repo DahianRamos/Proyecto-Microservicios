@@ -5,4 +5,6 @@ include 'prestamos'
 include 'eureka-server'
 include 'gateway'
 include 'pagos'
+include 'gateway'
+include 'microservicios'
 
