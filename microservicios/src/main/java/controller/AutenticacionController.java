@@ -22,9 +22,20 @@ import javax.servlet.http.HttpServletRequest;
 @AllArgsConstructor
 public class AutenticacionController {
 
-    private final LoginServicio loginServicio;
-    private final JwtTokenProvider jwtTokenProvider;
 
+
+    private final LoginServicio loginServicio;
+
+    private final KeycloakToken keycloakToken;
+  //Realizar metodo que recibe el token de keyloack usando feing
+    // averiguar sobre el requestbody del token que llegara por el servidor de keyloack
+
+    @PostMapping("/signin")
+    public ResponseEntity<Respuesta<TokenDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception {
+        TokenDTO tokenDTO = keycloakToken.getToken(loginDTO.getUsername(), loginDTO.getPassword());
+        return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("Login correcto", tokenDTO));
+    }
+    /**
     @PostMapping("/signin")
     public ResponseEntity<Respuesta<TokenDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception{
         return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("Login correcto", loginServicio.login(loginDTO)) );
@@ -32,7 +43,6 @@ public class AutenticacionController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Respuesta<TokenDTO>> refresh(HttpServletRequest request) throws Exception{
-        String token = jwtTokenProvider.resolveToken(request);
         return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("", loginServicio.refresh(new TokenDTO(token))) );
     }
 
@@ -40,5 +50,7 @@ public class AutenticacionController {
     public ResponseEntity<Respuesta<String>> createUser(@RequestBody NewUserDTO newUserDTO) throws Exception{
         return ResponseEntity.status(HttpStatus.CREATED).body(new Respuesta<>(loginServicio.createUser(newUserDTO) ? "Creado correctamente": "Error", "") );
     }
+
+ */
 
 }

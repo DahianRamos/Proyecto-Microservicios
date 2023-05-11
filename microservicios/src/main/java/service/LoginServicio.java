@@ -16,9 +16,8 @@ public class LoginServicio {
 
     private  UserRepo userRepo;
     private  PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
 
-
+     /**
     public TokenDTO login(LoginDTO loginDTO) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(),
@@ -56,4 +55,5 @@ public class LoginServicio {
         userRepository.save(user);
         return true;
     }
+      */
 }
