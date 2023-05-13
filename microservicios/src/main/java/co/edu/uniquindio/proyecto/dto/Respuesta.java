@@ -1,4 +1,4 @@
-package dto;
+package co.edu.uniquindio.proyecto.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

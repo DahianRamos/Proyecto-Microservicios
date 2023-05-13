@@ -1,12 +1,12 @@
 
-package service;
+package co.edu.uniquindio.proyecto.service;
 
 
-import controller.AutenticacionController;
+import co.edu.uniquindio.proyecto.controller.AutenticacionController;
+import co.edu.uniquindio.proyecto.repo.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import repo.UserRepo;
 
 @Service
 @AllArgsConstructor
@@ -14,7 +14,7 @@ public class LoginServicio {
 
     private  AutenticacionController autenticacionController;
 
-    private  UserRepo userRepo;
+    private UserRepo userRepo;
     private  PasswordEncoder passwordEncoder;
 
      /**

@@ -1,9 +1,10 @@
-package controller;
+package co.edu.uniquindio.proyecto.controller;
 
-import dto.LoginDTO;
-import dto.NewUserDTO;
-import dto.Respuesta;
-import dto.TokenDTO;
+import co.edu.uniquindio.proyecto.dto.LoginDTO;
+import co.edu.uniquindio.proyecto.dto.NewUserDTO;
+import co.edu.uniquindio.proyecto.dto.Respuesta;
+import co.edu.uniquindio.proyecto.dto.TokenDTO;
+import co.edu.uniquindio.proyecto.service.LoginServicio;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import service.LoginServicio;
 import security.JwtTokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +26,12 @@ public class AutenticacionController {
 
     private final LoginServicio loginServicio;
 
-    private final KeycloakToken keycloakToken;
+    private final KeycloakToken3 keycloakToken;
   //Realizar metodo que recibe el token de keyloack usando feing
     // averiguar sobre el requestbody del token que llegara por el servidor de keyloack
 
-    @PostMapping("/signin")
-    public ResponseEntity<Respuesta<TokenDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception {
-        TokenDTO tokenDTO = keycloakToken.getToken(loginDTO.getUsername(), loginDTO.getPassword());
-        return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("Login correcto", tokenDTO));
-    }
-    /**
+
+
     @PostMapping("/signin")
     public ResponseEntity<Respuesta<TokenDTO>> login(@RequestBody LoginDTO loginDTO) throws Exception{
         return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("Login correcto", loginServicio.login(loginDTO)) );
@@ -51,6 +47,6 @@ public class AutenticacionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new Respuesta<>(loginServicio.createUser(newUserDTO) ? "Creado correctamente": "Error", "") );
     }
 
- */
+
 
 }
