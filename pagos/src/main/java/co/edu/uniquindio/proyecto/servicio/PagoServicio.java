@@ -1,39 +1,34 @@
 package co.edu.uniquindio.proyecto.servicio;
 
 import co.edu.uniquindio.proyecto.dto.*;
+import co.edu.uniquindio.proyecto.model.DetallePago;
 import co.edu.uniquindio.proyecto.model.Pago;
-import co.edu.uniquindio.proyecto.model.Producto;
 import co.edu.uniquindio.proyecto.repo.PagoRepo;
-import co.edu.uniquindio.proyecto.repo.ProductoRepo;
 import co.edu.uniquindio.proyecto.servicio.excepciones.PagoNoEncontradoException;
 import co.edu.uniquindio.proyecto.servicio.excepciones.ProductoNoEncontradoException;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @AllArgsConstructor
 public class PagoServicio {
     private final RestTemplate restTemplate;
     private final PagoRepo pagoRepo;
-    private final ProductoRepo productoRepo;
 
     public Pago save(PagoDTO pago){
 
-        Optional<Pago> guardado = pagoRepo.findById(pago.pagoId());
-
-        if(guardado.isPresent()){
-            throw new RuntimeException("El Pago con el codigo"+pago.pagoId()+" ya existe");
-        }
+//        Optional<Pago> guardado = pagoRepo.findById(pago.pagoId());
+//
+//        if(guardado.isPresent()){
+//            throw new RuntimeException("El Pago con el codigo"+pago.pagoId()+" ya existe");
+//        }
 
         return pagoRepo.save( convertir(pago) );
     }
@@ -54,39 +49,53 @@ public class PagoServicio {
 
     private Pago convertir(PagoDTO pago) throws ProductoNoEncontradoException {
 
-        List<Producto> productos = productoRepo.findAllById(pago.codigoProductos());
+        List<DetallePago> detallePagos = pago.detallePagos().stream()
+                .map(
+                        detalle->new DetallePago(detalle.precioaProducto(),detalle.idProducto(), detalle.unidades())
+                ).toList();
 
-        List<Long> idsExistentes = productos.stream().map(Producto::getId).toList();
+        //validarProductos(detallePagos);
+        final double valorPago = calcularValorPago(detallePagos);
 
-        if(productos.size()!=pago.codigoProductos().size()){
 
-            String noEncontrados = pago.codigoProductos()
-                    .stream()
-                    .filter(id -> !idsExistentes.contains(id))
-                    .map(Object::toString)
-                    .collect(Collectors.joining(","));
-
-            throw new ProductoNoEncontradoException("Los Productos "+noEncontrados+" no existen");
-
-        }
 
         Pago nuevo = Pago.builder()
-                .codigo(pago.pagoId())
-                .valorPago(pago.valorPago())
+                 //.codigo(UUID.randomUUID().toString())
+                .valorPago(valorPago)
                 .codigoCliente(pago.codigoCliente())
-                .fechaPago(pago.fechaPago())
-                .codigoProductos(idsExistentes)
+                .fechaPago(LocalDateTime.now())
+                .detallePagos(detallePagos)
+                .tipoPago(pago.tipoPago())
                 .build();
 
         return nuevo;
     }
-    public PagoIdDTO validarListaPagos(List<String> listaLibros) {
-        List<Pago> listaPagosExistentes = pagoRepo.findAllById(listaLibros);
+
+
+    public boolean validarProductos(List<DetallePago> detallePagos, List<Long> listaProductos) {
+        for (DetallePago detalle : detallePagos) {
+            if (!listaProductos.contains(detalle.getIdProducto())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private double calcularValorPago(List<DetallePago> detallePagos) {
+        double total=0;
+        for (DetallePago d: detallePagos) {
+            total += d.getPrecioProducto() * d.getUnidades();
+        }
+        return total;
+    }
+
+    public PagoIdDTO validarListaPagos(List<String> listaPagos) {
+        List<Pago> listaPagosExistentes = pagoRepo.findAllById(listaPagos);
         boolean result = true;
 
         //result = false;
         List<String> idsExistentes = listaPagosExistentes.stream().map(Pago::getCodigo).toList();
-        List<String> noEncontrados = listaLibros
+        List<String> noEncontrados = listaPagos
                 .stream()
                 .filter(id -> !idsExistentes.contains(id))
                 .map(Object::toString)
@@ -114,25 +123,25 @@ public class PagoServicio {
         }
     }
 
-    public List<Pago> findByCodigoCliente(String codigoCliente){
-
-        ClienteGetDTO cliente = findClienteByCodigo(codigoCliente);
-        log.info("cliente {}", cliente);
-
-        List<PagoQueryDTO> lista = pagoRepo.findByCodigoCliente(codigoCliente);
-        List<Pago> respuesta = new ArrayList<>();
-
-        for(PagoQueryDTO q : lista){
-            if(respuesta.stream().noneMatch(r -> r.getCodigo() == q.getPagoID())){
-                ArrayList<Long> productos = new ArrayList<>();
-                productos.add(q.getCodigoProducto());
-                respuesta.add( new Pago(q.getPagoID(), q.getValorPago(), q.getClienteID(), q.getFechaPago(),q.getTipoPago(), productos ) );
-            }else{
-                respuesta.stream().findAny().get().getCodigoProductos().add( q.getCodigoProducto() );
-            }
-        }
-
-        return new ArrayList<>();
-
-    }
+//    public List<Pago> findByCodigoCliente(String codigoCliente){
+//
+//        ClienteGetDTO cliente = findClienteByCodigo(codigoCliente);
+//        log.info("cliente {}", cliente);
+//
+//        List<PagoQueryDTO> lista = pagoRepo.findByCodigoCliente(codigoCliente);
+//        List<Pago> respuesta = new ArrayList<>();
+//
+//        for(PagoQueryDTO q : lista){
+//            if(respuesta.stream().noneMatch(r -> r.getCodigo() == q.getPagoID())){
+//                ArrayList<String> detallesPagos = new ArrayList<>();
+//                detallesPagos.add(q.getCodigoDetalle());
+//                respuesta.add( new Pago(q.getPagoID(), q.getValorPago(), q.getClienteID(), q.getFechaPago(),q.getTipoPago(),detallesPagos) );
+//            }else{
+//                respuesta.stream().findAny().get().getDetallePagos().add( q.getCodigoDetalle());
+//            }
+//        }
+//
+//        return new ArrayList<>();
+//
+//    }
 }

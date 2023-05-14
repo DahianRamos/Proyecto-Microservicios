@@ -24,14 +24,14 @@ public class PagoController {
         return ResponseEntity.status(HttpStatus.CREATED).body( new Respuesta<>("Producto creado correctamente", pagoServicio.save(pagoDTO)) );
     }
 
-    @GetMapping("/cliente/{codigoCliente}")
-    public ResponseEntity<Respuesta<List<Pago>>> findByCodigoCliente(@PathVariable String codigoCliente){
-        return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("", pagoServicio.findByCodigoCliente(codigoCliente)));
-    }
+//    @GetMapping("/cliente/{codigoCliente}")
+//    public ResponseEntity<Respuesta<List<Pago>>> findByCodigoCliente(@PathVariable String codigoCliente){
+//        return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("", pagoServicio.findByCodigoCliente(codigoCliente)));
+//    }
 
     @GetMapping
     public ResponseEntity<Respuesta<List<Pago>>> findAll(){
-        return ResponseEntity.status(HttpStatus.OK).body( new Respuesta<>("", pagoServicio.findAll()) );
+        return ResponseEntity.status(HttpStatus.OK).body( new Respuesta<>("", pagoServicio.findAll()));
     }
 
     @GetMapping("/{pagoId}")
@@ -44,7 +44,7 @@ public class PagoController {
         return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("Pago borrado correctamente"));
     }
 
-    @PostMapping("/validarListaLibros")
+    @PostMapping("/validarListaPagos")
     public ResponseEntity<Respuesta<PagoIdDTO>> validarListaPagos(@RequestBody List<String> listaPagos) {
         return ResponseEntity.status(HttpStatus.OK).body(new Respuesta<>("", pagoServicio.validarListaPagos(listaPagos)));
     }

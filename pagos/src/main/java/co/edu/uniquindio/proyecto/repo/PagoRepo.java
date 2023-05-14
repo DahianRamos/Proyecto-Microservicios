@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface PagoRepo extends JpaRepository<Pago, String> {
-    @Query("select new co.edu.uniquindio.proyecto.dto.PagoQueryDTO(p.codigo, q.valorPago, p.codigoCliente, p.fechaPago,q.tipoPago) from Pago p join p.codigoProductos l where p.codigoCliente = :codigoCliente")
-    List<PagoQueryDTO> findByCodigoCliente(String codigoCliente);
+//    @Query("select new co.edu.uniquindio.proyecto.dto.PagoQueryDTO(p.codigo, q.valorPago, p.codigoCliente, p.fechaPago,q.tipoPago) from Pago p join p.codigoProductos l where p.codigoCliente = :codigoCliente")
+//    List<PagoQueryDTO> findByCodigoCliente(String codigoCliente);
 
 
 }
