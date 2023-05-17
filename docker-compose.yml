@@ -4,11 +4,7 @@ volumes:
   keycloak_data:
 services:
 
-  eureka-server:
-    build: ./eureka-server
-    restart: always
-    ports:
-      - "8761:8761"
+
 
   keycloak:
     image: quay.io/keycloak/keycloak:21.0.2
@@ -21,27 +17,36 @@ services:
     ports:
       - 9090:8080
 
-#  microservicios:
-#    build: ./microservicios
-#    restart: always
-#    depends_on:
-#      - keycloak
-#      - eureka-server
-#    environment:
-#      keycloack.admin-url: http://keycloak:8080/admin/realms/tutorial-api
-#      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
-#      eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
 
-#  gateway:
-#    build: ./gateway
-#    restart: always
-#    depends_on:
-#      - eureka-server
-#      - keycloak
-#    environment:
-#      server.port: 8082
-#      eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
-#      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
-#      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/realms/tutorial-api/protocol/openid-connect/certs
-#    ports:
-#      - "8080:8082"
+  eureka:
+    build: ./eureka-server
+    restart: always
+    ports:
+      - "8761:8761"
+
+  microservicios:
+    build: ./microservicios
+    restart: always
+    depends_on:
+      - keycloak
+      - eureka
+    environment:
+      keycloack.admin-url: http://keycloak:8080/admin/realms/tutorial-api
+      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
+      URL_aut: http://keycloak:8080/realms/tutorial-api/protocol/openid-connect/token
+      eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
+
+
+  gateway:
+    build: ./gateway
+    restart: always
+    depends_on:
+      - eureka
+      - keycloak
+    environment:
+      server.port: 8082
+      spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
+      spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/realms/tutorial-api/protocol/openid-connect/certs
+      eureka.client.service-url.defaultZone: http://eureka:8761/eureka
+    ports:
+      - "8080:8082"

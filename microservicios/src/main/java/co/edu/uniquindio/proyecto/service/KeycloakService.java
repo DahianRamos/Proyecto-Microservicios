@@ -4,6 +4,7 @@ import co.edu.uniquindio.proyecto.dto.LoginDTO;
 import co.edu.uniquindio.proyecto.dto.TokenResponseDTO;
 import co.edu.uniquindio.proyecto.feingClients.TokenKeycloakFeing;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KeycloakService {
 
+    @Autowired
     private final TokenKeycloakFeing tokenKeycloakFeing;
 
 
