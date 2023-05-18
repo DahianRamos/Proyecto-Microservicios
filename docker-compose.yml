@@ -4,8 +4,6 @@ volumes:
   keycloak_data:
 services:
 
-
-
   keycloak:
     image: quay.io/keycloak/keycloak:21.0.2
     command: start-dev
@@ -15,10 +13,9 @@ services:
     volumes:
       - 'keycloak_data:/opt/keycloak/data/'
     ports:
-      - 9090:8080
+      - "9090:8080"
 
-
-  eureka:
+  eureka-server:
     build: ./eureka-server
     restart: always
     ports:
@@ -29,24 +26,24 @@ services:
     restart: always
     depends_on:
       - keycloak
-      - eureka
+      - eureka-server
     environment:
       keycloack.admin-url: http://keycloak:8080/admin/realms/tutorial-api
       spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
       URL_aut: http://keycloak:8080/realms/tutorial-api/protocol/openid-connect/token
       eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
 
-
   gateway:
     build: ./gateway
     restart: always
     depends_on:
-      - eureka
+      - eureka-server
+      - microservicios
       - keycloak
     environment:
       server.port: 8082
       spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/tutorial-api
       spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://keycloak:8080/realms/tutorial-api/protocol/openid-connect/certs
-      eureka.client.service-url.defaultZone: http://eureka:8761/eureka
+      eureka.client.service-url.defaultZone: http://eureka-server:8761/eureka
     ports:
       - "8080:8082"

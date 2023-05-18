@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KeycloakService {
 
-    @Autowired
     private final TokenKeycloakFeing tokenKeycloakFeing;
-
 
     public TokenResponseDTO getTokenAdmin(){
         return getToken(new LoginDTO("globaladmin", "password"));
