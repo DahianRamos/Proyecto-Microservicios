@@ -19,7 +19,7 @@ public class PagoQueryDTO {
     private String clienteID;
     private LocalDateTime fechaPago;
     private TipoPago tipoPago;
-    private Long codigoProducto;
+    private String codigoDetalle;
 
 
 }

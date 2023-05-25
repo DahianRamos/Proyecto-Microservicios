@@ -1,9 +1,6 @@
 package co.edu.uniquindio.proyecto.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +16,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class Pago implements Serializable {
-    @Id
+    @Id()
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String codigo;
 
     private double valorPago;
@@ -28,9 +26,8 @@ public class Pago implements Serializable {
     private LocalDateTime fechaPago;
     @Column(nullable = false)
     private TipoPago tipoPago;
-
     @ElementCollection
-    private List<Long> codigoProductos;
+    private List<DetallePago> detallePagos;
 
 
 }
