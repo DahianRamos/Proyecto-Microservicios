@@ -7,6 +7,7 @@ import co.edu.uniquindio.proyecto.model.Pago;
 import co.edu.uniquindio.proyecto.model.Producto;
 import co.edu.uniquindio.proyecto.servicio.PagoServicio;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PagoController {
     private final PagoServicio pagoServicio;
-
+    @Value("${app.mensaje}")
+    private String mensaje;
     @PostMapping
     public ResponseEntity<Respuesta<Pago>> save(@RequestBody PagoDTO pagoDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body( new Respuesta<>("Producto creado correctamente", pagoServicio.save(pagoDTO)) );
