@@ -24,7 +24,7 @@ public class WebSecurityConfig {
 
         http
                 .authorizeExchange( e ->
-                        e.pathMatchers("/api/auth/**","/api/test/anonymous").permitAll()
+                        e.pathMatchers("/api/auth/","/api/test/anonymous").permitAll()
                                 .pathMatchers("/api/pago").permitAll()
                                 .pathMatchers("/api/test/admin").hasRole(ADMIN)
                                 .pathMatchers("/api/test/user").hasAnyRole(ADMIN, USER)
