@@ -19,8 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 public class PagoController {
     private final PagoServicio pagoServicio;
+
     @Value("${app.mensaje}")
     private String mensaje;
+
     @PostMapping
     public ResponseEntity<Respuesta<Pago>> save(@RequestBody PagoDTO pagoDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body( new Respuesta<>("Producto creado correctamente", pagoServicio.save(pagoDTO)) );
